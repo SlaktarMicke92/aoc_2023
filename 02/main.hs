@@ -1,31 +1,37 @@
+import Data.List (isPrefixOf)
 
 readData :: FilePath -> IO String
 readData file = do
   readFile file
 
-redCubeLimit :: Int
-redCubeLimit = 12
+first :: [String] -> [String]
+first [] = []
+first (x:xs) = x:second xs
 
-greenCubeLimit :: Int
-greenCubeLimit = 13
+second :: [String] -> [String]
+second [] = []
+second (_:xs) = first xs
 
-blueCubeLimit :: Int
-blueCubeLimit = 14
+getColorValues :: String -> (String, String) -> Int
+getColorValues checkColor (value, color) = do
+    if checkColor `isPrefixOf` color then read value :: Int else 0
 
-isGamePossible :: Int -> Int -> Int -> Int
-isGamePossible reds greens blues = if reds <= redCubeLimit && greens <= greenCubeLimit && blues <= blueCubeLimit then 1 else 0
+powerOfSet :: Int -> Int -> Int -> Int
+powerOfSet red green blue = red * green * blue
 
-findCubes :: String -> String -> Int
-findCubes line color = do
-    -- Fix logic for this function
-    1
+findCubes :: [String] -> String -> Int
+findCubes splitLines checkColor = do
+    let zipped = zip (first splitLines) (second splitLines)
+    let cubeList = map (getColorValues checkColor) zipped
+    if null cubeList then 0 else maximum cubeList 
 
 getIfPossible :: String -> Int
 getIfPossible line = do
-    let red = findCubes line "red"
-    let green = findCubes line "green"
-    let blue = findCubes line "blue"
-    isGamePossible red green blue
+    let game = words line
+    let red = findCubes game "red"
+    let green = findCubes game "green"
+    let blue = findCubes game "blue"
+    powerOfSet red green blue
 
 main :: IO ()
 main = do
